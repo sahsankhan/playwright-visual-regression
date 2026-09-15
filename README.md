@@ -2,7 +2,7 @@
 
 Playwright built-in screenshot comparison (`expect().toHaveScreenshot()`) against the [Toolshop](https://practicesoftwaretesting.com) UI.
 
-Agency-ready template: smoke journey (home catalog + product detail), committed baselines, HTML diff report on failure, CI on Windows (matches snapshot platform).
+Agency-ready template: smoke journey, committed baselines, industry-standard **Expected / Actual / Diff** reporting.
 
 ## Prerequisites
 
@@ -24,17 +24,18 @@ On macOS/Linux use `cp .env.example .env`.
 ## Run
 
 ```powershell
-npm test                  # compare against baselines
+npm test                  # compare + open visual summary
 npm run test:headed       # visible browser
 npm run test:smoke        # @smoke journey only
 npm run test:update-snapshots   # refresh baselines after intentional UI change
-npm run report            # open HTML report (shows diff images on failure)
+npm run report            # open Playwright HTML report
+npm run report:summary    # rebuild summary from last JSON results
 ```
 
 ## Journey
 
 1. **Home catalog** — viewport screenshot after catalog grid loads; dynamic banner/profile masked.
-2. **Product detail** — viewport screenshot after product title loads; product resolved via Toolshop API.
+2. **Product detail** — viewport screenshot after add-to-cart loads; product resolved via Toolshop API.
 
 ## Baselines
 
@@ -56,20 +57,47 @@ git add tests/catalog-visual.spec.js-snapshots
 git commit -m "Update visual baselines"
 ```
 
-**Platform note:** Baselines in this repo are generated on **Windows + Chromium**. CI uses `windows-latest` so snapshots stay consistent. If you regenerate on Linux/macOS, filenames and rendering may differ — re-run update on Windows or adjust CI runner to match your dev OS.
+**Platform note:** Baselines are generated on **Windows + Chromium**. CI uses `windows-latest` so snapshots stay consistent.
 
-## Reports
+## Reporting (industry pattern)
+
+Playwright-native visual regression uses two layers — same approach teams use before adopting Percy/Chromatic:
+
+### 1. Visual summary (stakeholder-friendly)
 
 | Output | Path |
 |---|---|
-| HTML report (diff highlights) | `playwright-report/` |
-| Failure artifacts | `test-results/` |
+| Summary dashboard | `reports/visual-summary.html` |
+| Side-by-side bundle | `reports/visual-run/{case}/expected.png`, `actual.png`, `diff.png` |
+| Machine-readable JSON | `reports/visual-results.json` |
 
-On CI failure, download the `visual-diffs` artifact for expected/actual/diff images.
+Open `reports/visual-summary.html` after every `npm test`. On **pass**, you see baseline thumbnails. On **fail**, you get the industry-standard **Expected · Actual · Diff** triptych.
+
+### 2. Playwright HTML report (developer detail)
+
+| Output | Path |
+|---|---|
+| Interactive HTML report | `playwright-report/index.html` |
+| Raw failure attachments | `test-results/` |
+
+The Playwright HTML report is the canonical built-in diff viewer — click a failed test to inspect screenshots with Playwright's attachment UI. Run `npm run report` to open it anytime.
+
+### CI artifacts
+
+GitHub Actions uploads one artifact: **`visual-regression-reports`** containing both `playwright-report/` and `reports/`. Download, extract fully, then open `reports/visual-summary.html`.
+
+### vs SaaS visual tools
+
+| Approach | When teams use it |
+|---|---|
+| **Playwright built-in** (this repo) | Free, git-tracked baselines, PR-friendly, no external service |
+| **Percy / Chromatic / Argos** | Design-system teams wanting cloud history, PR comments, approval workflows |
+
+This template uses Playwright built-in — the reporting pattern (Expected / Actual / Diff) is the same; delivery is local HTML + CI artifacts instead of a cloud dashboard.
 
 ## CI
 
-GitHub Actions runs `npm run test:smoke` on `windows-latest` and uploads the Playwright HTML report.
+GitHub Actions runs `npm run test:smoke` on `windows-latest`, builds the visual summary, and uploads reports.
 
 ## Environment
 

@@ -4,11 +4,12 @@
   "private": true,
   "description": "Playwright built-in visual regression against Toolshop UI.",
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "cross-env HEADLESS=false playwright test",
-    "test:smoke": "playwright test --grep @smoke",
+    "test": "node src/utils/run.js",
+    "test:headed": "node src/utils/run.js --headed",
+    "test:smoke": "node src/utils/run.js --grep @smoke",
     "test:update-snapshots": "playwright test --update-snapshots",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "report:summary": "node src/utils/visualReport.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",

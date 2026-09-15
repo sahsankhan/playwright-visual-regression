@@ -12,8 +12,17 @@ module.exports = defineConfig({
   timeout: timeoutMs,
   snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   reporter: isCi
-    ? [['html', { open: 'never' }], ['github'], ['list']]
-    : [['html', { open: 'never' }], ['list']],
+    ? [
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'reports/visual-results.json' }],
+        ['github'],
+        ['list'],
+      ]
+    : [
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'reports/visual-results.json' }],
+        ['list'],
+      ],
   expect: {
     timeout: 15_000,
     toHaveScreenshot: {

@@ -4,8 +4,8 @@
   "private": true,
   "description": "Playwright built-in visual regression against Toolshop UI.",
   "scripts": {
-    "test": "node src/utils/run.js",
-    "test:headed": "node src/utils/run.js --headed",
+    "test": "node src/utils/run.js --grep @smoke",
+    "test:headed": "node src/utils/run.js --headed --grep @smoke",
     "test:smoke": "node src/utils/run.js --grep @smoke",
     "test:update-snapshots": "playwright test --update-snapshots",
     "report": "playwright show-report",

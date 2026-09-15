@@ -1,0 +1,41 @@
+const { defineConfig, devices } = require('@playwright/test');
+const { uiBaseUrl, headless, timeoutMs, maxDiffPixelRatio } = require('./src/config');
+
+const isCi = Boolean(process.env.CI);
+
+module.exports = defineConfig({
+  testDir: './tests',
+  fullyParallel: false,
+  forbidOnly: isCi,
+  retries: isCi ? 1 : 0,
+  workers: 1,
+  timeout: timeoutMs,
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
+  reporter: isCi
+    ? [['html', { open: 'never' }], ['github'], ['list']]
+    : [['html', { open: 'never' }], ['list']],
+  expect: {
+    timeout: 15_000,
+    toHaveScreenshot: {
+      maxDiffPixelRatio,
+      animations: 'disabled',
+      caret: 'hide',
+      scale: 'css',
+    },
+  },
+  use: {
+    baseURL: uiBaseUrl,
+    headless,
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
+    viewport: { width: 1280, height: 720 },
+    deviceScaleFactor: 1,
+    trace: 'retain-on-failure',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});

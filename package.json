@@ -1,0 +1,18 @@
+{
+  "name": "playwright-visual-regression",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright built-in visual regression against Toolshop UI.",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "cross-env HEADLESS=false playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:update-snapshots": "playwright test --update-snapshots",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7"
+  }
+}

@@ -13,9 +13,11 @@ This template demonstrates four things agencies need to show clients:
 
 The `@demo` test injects a **red navbar** and fails against the committed baseline. Playwright highlights every changed pixel:
 
-![Visual regression diff — red navbar injected, changed pixels highlighted](docs/assets/home-catalog-diff.png)
+<p align="center">
+  <img src="assets/home-catalog-diff.png" alt="Visual regression diff — changed pixels highlighted after red navbar injection" width="900" />
+</p>
 
-*~97k pixels (11%) differ · regenerate with `npm run demo:diff`*
+<p align="center"><em>~97k pixels (11%) differ · regenerate with <code>npm run demo:diff</code></em></p>
 
 ---
 
@@ -46,7 +48,7 @@ copy .env.example .env
 npm run test:smoke        # CI journey — must pass (@smoke only)
 npm test                  # all tests except @demo; opens summary report
 npm run test:update-snapshots   # refresh baselines after intentional UI change
-npm run demo:diff         # deliberate failure → refreshes docs/assets/*.png
+npm run demo:diff         # deliberate failure → refreshes assets/*.png
 npm run report            # Playwright HTML report (interactive diffs)
 ```
 
@@ -110,7 +112,7 @@ Masked regions appear as **pink boxes** in Playwright's diff output — they are
 
 ---
 
-## 4. Deliberate failure — diff proof
+## 4. Deliberate failure — Expected · Actual · Diff
 
 The `@demo` test injects a red navbar (simulating a breaking CSS deploy) and compares against the real baseline. It **always fails** and produces diff artifacts.
 
@@ -118,13 +120,25 @@ The `@demo` test injects a red navbar (simulating a breaking CSS deploy) and com
 npm run demo:diff
 ```
 
-That command runs the demo test, copies Playwright's output to `docs/assets/`, and exits successfully only if a diff was captured.
+That command runs the demo test, copies Playwright's output to `assets/`, and exits successfully only if a diff was captured.
 
-| | Image |
-|---|---|
-| **Expected** (baseline) | ![Expected](docs/assets/home-catalog-expected.png) |
-| **Actual** (broken UI) | ![Actual](docs/assets/home-catalog-actual.png) |
-| **Diff** (fails CI) | ![Diff](docs/assets/home-catalog-diff.png) |
+**Expected (baseline)**
+
+<p align="center">
+  <img src="assets/home-catalog-expected.png" alt="Expected baseline screenshot" width="900" />
+</p>
+
+**Actual (broken UI — red navbar injected)**
+
+<p align="center">
+  <img src="assets/home-catalog-actual.png" alt="Actual screenshot after injected UI break" width="900" />
+</p>
+
+**Diff (what fails the test — changed pixels highlighted)**
+
+<p align="center">
+  <img src="assets/home-catalog-diff.png" alt="Diff screenshot highlighting changed pixels" width="900" />
+</p>
 
 To reproduce locally:
 

@@ -2,7 +2,7 @@ const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const assetsDir = path.join('docs', 'assets');
+const assetsDir = path.join('assets');
 
 function findAttachmentFiles(rootDir) {
   const found = { expected: null, actual: null, diff: null };
@@ -68,9 +68,9 @@ const copied = {
 };
 
 console.log('\nCaptured README assets:');
-console.log(`  expected: ${copied.expected ? 'docs/assets/home-catalog-expected.png' : 'MISSING'}`);
-console.log(`  actual:   ${copied.actual ? 'docs/assets/home-catalog-actual.png' : 'MISSING'}`);
-console.log(`  diff:     ${copied.diff ? 'docs/assets/home-catalog-diff.png' : 'MISSING'}`);
+console.log(`  expected: ${copied.expected ? 'assets/home-catalog-expected.png' : 'MISSING'}`);
+console.log(`  actual:   ${copied.actual ? 'assets/home-catalog-actual.png' : 'MISSING'}`);
+console.log(`  diff:     ${copied.diff ? 'assets/home-catalog-diff.png' : 'MISSING'}`);
 
 if (!copied.diff) {
   console.error('\nDiff image was not captured. Check test-results/ after the demo run.');

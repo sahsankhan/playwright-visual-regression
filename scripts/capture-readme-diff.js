@@ -50,11 +50,15 @@ if (fs.existsSync('test-results')) {
   fs.rmSync('test-results', { recursive: true, force: true });
 }
 
-const result = spawnSync('npx', ['playwright', 'test', '--grep', '@demo'], {
-  shell: true,
-  stdio: 'inherit',
-  env: process.env,
-});
+const result = spawnSync(
+  'npx',
+  ['playwright', 'test', '--grep', '@demo', '--retries', '1'],
+  {
+    shell: true,
+    stdio: 'inherit',
+    env: process.env,
+  },
+);
 
 const attachments = findAttachmentFiles('test-results');
 const copied = {

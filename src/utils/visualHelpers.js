@@ -1,7 +1,11 @@
 /** @param {import('@playwright/test').Page} page */
 async function prepareCatalogPage(page) {
-  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
-  await page.locator('[data-test="product-name"]').first().waitFor({ state: 'visible' });
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
+  await page
+    .locator('[data-test="product-name"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 45_000 });
   await page.evaluate(() => {
     document.querySelectorAll('img').forEach((img) => {
       if (!img.complete) {

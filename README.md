@@ -9,6 +9,14 @@ This template demonstrates four things agencies need to show clients:
 3. **Dynamic region masking** — flaky areas excluded from pixel compare  
 4. **Deliberate failure + diff** — proof the framework catches UI breaks  
 
+### Diff proof (deliberate break)
+
+The `@demo` test injects a **red navbar** and fails against the committed baseline. Playwright highlights every changed pixel:
+
+![Visual regression diff — red navbar injected, changed pixels highlighted](docs/assets/home-catalog-diff.png)
+
+*~97k pixels (11%) differ · regenerate with `npm run demo:diff`*
+
 ---
 
 ## What this catches
@@ -112,19 +120,11 @@ npm run demo:diff
 
 That command runs the demo test, copies Playwright's output to `docs/assets/`, and exits successfully only if a diff was captured.
 
-### Expected (baseline)
-
-![Home catalog baseline](docs/assets/home-catalog-expected.png)
-
-### Actual (after injected break)
-
-![Home catalog actual — red navbar injected](docs/assets/home-catalog-actual.png)
-
-### Diff (pixels that changed — this is what fails CI)
-
-![Home catalog diff — changed pixels highlighted](docs/assets/home-catalog-diff.png)
-
-In this run **~97k pixels (11%)** differ — Playwright flags the navbar color change immediately.
+| | Image |
+|---|---|
+| **Expected** (baseline) | ![Expected](docs/assets/home-catalog-expected.png) |
+| **Actual** (broken UI) | ![Actual](docs/assets/home-catalog-actual.png) |
+| **Diff** (fails CI) | ![Diff](docs/assets/home-catalog-diff.png) |
 
 To reproduce locally:
 

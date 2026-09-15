@@ -82,5 +82,5 @@ if (result.status === 0) {
   process.exit(1);
 }
 
-console.log('\nDone. Commit docs/assets/*.png and reference them in README.');
+console.log('\nDone. Commit assets/*.png — README embeds them with <img> tags.');
 process.exit(0);

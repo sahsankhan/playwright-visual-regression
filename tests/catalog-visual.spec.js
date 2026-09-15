@@ -25,3 +25,21 @@ test.describe('Toolshop visual regression @smoke', () => {
     });
   });
 });
+
+// Demo only — deliberately fails against the committed home-catalog baseline.
+// Run: npm run demo:diff (generates docs/assets/* for README; not part of CI smoke).
+test.describe('Intentional diff demo @demo', () => {
+  test('home catalog detects injected navbar color change', async ({ page }) => {
+    await page.goto(`${uiBaseUrl}/`);
+    await prepareCatalogPage(page);
+
+    await page.addStyleTag({
+      content: 'nav.navbar, .navbar, header { background-color: #dc2626 !important; }',
+    });
+
+    await expect(page).toHaveScreenshot('home-catalog.png', {
+      fullPage: false,
+      mask: dynamicMasks(page),
+    });
+  });
+});

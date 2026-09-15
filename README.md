@@ -1,17 +1,28 @@
 # Playwright Visual Regression
 
-Playwright built-in screenshot comparison (`expect().toHaveScreenshot()`) against the [Toolshop](https://practicesoftwaretesting.com) UI.
+Playwright **built-in snapshot** comparison (`expect().toHaveScreenshot()`) against the [Toolshop](https://practicesoftwaretesting.com) UI.
 
-Agency-ready template: smoke journey, committed baselines, industry-standard **Expected / Actual / Diff** reporting.
+This template demonstrates four things agencies need to show clients:
 
-## Prerequisites
+1. **Built-in Playwright snapshots** — no Percy/Chromatic required  
+2. **Baseline management** — baselines committed in git, updated with one command  
+3. **Dynamic region masking** — flaky areas excluded from pixel compare  
+4. **Deliberate failure + diff** — proof the framework catches UI breaks  
 
-- Node.js 18+
-- npm
+---
+
+## What this catches
+
+Compares live screenshots to committed **baseline PNGs**. Any unexpected pixel change fails the test and produces **Expected · Actual · Diff** images.
+
+| Screen | Baseline file | Notes |
+|---|---|---|
+| Home catalog | `home-catalog.png` | Viewport capture, dynamic areas masked |
+| Product detail | `product-detail.png` | Product ID from Toolshop API |
+
+---
 
 ## Setup
-
-From this folder:
 
 ```powershell
 npm install
@@ -19,85 +30,130 @@ npx playwright install chromium
 copy .env.example .env
 ```
 
-On macOS/Linux use `cp .env.example .env`.
+---
 
 ## Run
 
 ```powershell
-npm test                  # compare + open visual summary
-npm run test:headed       # visible browser
-npm run test:smoke        # @smoke journey only
+npm run test:smoke        # CI journey — must pass (@smoke only)
+npm test                  # all tests except @demo; opens summary report
 npm run test:update-snapshots   # refresh baselines after intentional UI change
-npm run report            # open Playwright HTML report
-npm run report:summary    # rebuild summary from last JSON results
+npm run demo:diff         # deliberate failure → refreshes docs/assets/*.png
+npm run report            # Playwright HTML report (interactive diffs)
 ```
 
-## Journey
+**Important:** `@smoke` tests must pass in CI. The `@demo` test **must fail** — it injects a breaking UI change on purpose to generate diff images for this README.
 
-1. **Home catalog** — viewport screenshot after catalog grid loads; dynamic banner/profile masked.
-2. **Product detail** — viewport screenshot after add-to-cart loads; product resolved via Toolshop API.
+---
 
-## Baselines
+## 1. Built-in Playwright snapshots
 
-Snapshots live in `tests/catalog-visual.spec.js-snapshots/` and are committed to git.
+Tests call Playwright's native matcher:
 
-Playwright compares pixel-by-pixel using `maxDiffPixelRatio` (default `0.01` = 1%). Override via `.env`:
+```javascript
+await expect(page).toHaveScreenshot('home-catalog.png', {
+  fullPage: false,
+  mask: dynamicMasks(page),
+});
+```
+
+Playwright stores baselines beside the spec file:
+
+```
+tests/catalog-visual.spec.js-snapshots/
+  home-catalog.png      ← committed baseline (expected)
+  product-detail.png
+```
+
+On each run Playwright captures a new screenshot, compares pixel-by-pixel (`maxDiffPixelRatio` default **1%**), and on mismatch writes **actual** + **diff** attachments.
+
+---
+
+## 2. Baseline management
+
+| Task | Command |
+|---|---|
+| First-time / intentional UI change | `npm run test:update-snapshots` |
+| Commit new baselines | `git add tests/catalog-visual.spec.js-snapshots` |
+| Review what changed | Open PR diff on `*.png` snapshots |
+
+Baselines are **version-controlled** — reviewers see visual changes in git like any other file.
+
+**Platform:** Baselines are generated on **Windows + Chromium**. CI uses `windows-latest` so local and CI renders match.
+
+---
+
+## 3. Mask dynamic regions
+
+Some UI areas change between runs (notification text, profile state). Comparing them causes false failures.
+
+`src/utils/visualHelpers.js` masks them before screenshot:
+
+```javascript
+function dynamicMasks(page) {
+  return [
+    page.locator('.testing-notification-bar'),
+    page.locator('[data-test="nav-profile"]'),
+  ];
+}
+```
+
+Masked regions appear as **pink boxes** in Playwright's diff output — they are excluded from the pixel comparison.
+
+---
+
+## 4. Deliberate failure — diff proof
+
+The `@demo` test injects a red navbar (simulating a breaking CSS deploy) and compares against the real baseline. It **always fails** and produces diff artifacts.
 
 ```powershell
-$env:MAX_DIFF_PIXEL_RATIO="0.02"; npm test
+npm run demo:diff
 ```
 
-### Updating baselines
+That command runs the demo test, copies Playwright's output to `docs/assets/`, and exits successfully only if a diff was captured.
 
-After an intentional UI change:
+### Expected (baseline)
+
+![Home catalog baseline](docs/assets/home-catalog-expected.png)
+
+### Actual (after injected break)
+
+![Home catalog actual — red navbar injected](docs/assets/home-catalog-actual.png)
+
+### Diff (pixels that changed — this is what fails CI)
+
+![Home catalog diff — changed pixels highlighted](docs/assets/home-catalog-diff.png)
+
+In this run **~97k pixels (11%)** differ — Playwright flags the navbar color change immediately.
+
+To reproduce locally:
 
 ```powershell
-npm run test:update-snapshots
-git add tests/catalog-visual.spec.js-snapshots
-git commit -m "Update visual baselines"
+npx playwright test --grep @demo
+# Exit code 1 — inspect test-results/ or run npm run demo:diff
 ```
 
-**Platform note:** Baselines are generated on **Windows + Chromium**. CI uses `windows-latest` so snapshots stay consistent.
+---
 
-## Reporting (industry pattern)
+## Reporting
 
-Playwright-native visual regression uses two layers — same approach teams use before adopting Percy/Chromatic:
+After `npm test` or a failed run:
 
-### 1. Visual summary (stakeholder-friendly)
+| Report | Path | Audience |
+|---|---|---|
+| Visual summary | `reports/visual-summary.html` | Stakeholders — Expected / Actual / Diff side-by-side |
+| Playwright HTML | `playwright-report/index.html` | Developers — click-through attachment viewer |
+| JSON results | `reports/visual-results.json` | CI / tooling |
 
-| Output | Path |
-|---|---|
-| Summary dashboard | `reports/visual-summary.html` |
-| Side-by-side bundle | `reports/visual-run/{case}/expected.png`, `actual.png`, `diff.png` |
-| Machine-readable JSON | `reports/visual-results.json` |
+CI uploads **`visual-regression-reports`** artifact (`playwright-report/` + `reports/`).
 
-Open `reports/visual-summary.html` after every `npm test`. On **pass**, you see baseline thumbnails. On **fail**, you get the industry-standard **Expected · Actual · Diff** triptych.
-
-### 2. Playwright HTML report (developer detail)
-
-| Output | Path |
-|---|---|
-| Interactive HTML report | `playwright-report/index.html` |
-| Raw failure attachments | `test-results/` |
-
-The Playwright HTML report is the canonical built-in diff viewer — click a failed test to inspect screenshots with Playwright's attachment UI. Run `npm run report` to open it anytime.
-
-### CI artifacts
-
-GitHub Actions uploads one artifact: **`visual-regression-reports`** containing both `playwright-report/` and `reports/`. Download, extract fully, then open `reports/visual-summary.html`.
-
-### vs SaaS visual tools
-
-| Approach | When teams use it |
-|---|---|
-| **Playwright built-in** (this repo) | Free, git-tracked baselines, PR-friendly, no external service |
-| **Percy / Chromatic / Argos** | Design-system teams wanting cloud history, PR comments, approval workflows |
-
-This template uses Playwright built-in — the reporting pattern (Expected / Actual / Diff) is the same; delivery is local HTML + CI artifacts instead of a cloud dashboard.
+---
 
 ## CI
 
-GitHub Actions runs `npm run test:smoke` on `windows-latest`, builds the visual summary, and uploads reports.
+GitHub Actions runs **`npm run test:smoke` only** (`@smoke` tag). The intentional `@demo` failure is for local/README proof, not CI.
+
+---
 
 ## Environment
 

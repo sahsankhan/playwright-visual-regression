@@ -46,7 +46,7 @@ npm run report              # open Playwright HTML report
 | Home catalog | `tests/catalog-visual.spec.js-snapshots/home-catalog.png` |
 | Product detail | `tests/catalog-visual.spec.js-snapshots/product-detail.png` |
 
-Product detail uses the first in-stock product from the Toolshop API.
+Product detail uses a fixed product ID (`PRODUCT_ID` in `.env`) so the screenshot stays stable.
 
 ## How it works
 
@@ -56,7 +56,13 @@ Product detail uses the first in-stock product from the Toolshop API.
 
 **On failure** — Playwright outputs Expected, Actual, and Diff images. Default tolerance: 1% pixel difference (`MAX_DIFF_PIXEL_RATIO=0.01` in `.env`).
 
-**Platform** — Baselines are Windows + Chromium. CI uses `windows-latest` to match.
+**Platform** — Baselines are generated in the official Playwright Docker image (same as CI). Regenerate with:
+
+```powershell
+npm run test:update-snapshots:docker
+```
+
+(Docker required.) Or run the **Update Snapshots** workflow on GitHub Actions.
 
 ## Reports
 
@@ -76,6 +82,6 @@ Runs `npm run test:smoke` on push/PR. The `@demo` diff test is README-only — n
 | Variable | Default |
 |---|---|
 | `UI_BASE_URL` | `https://practicesoftwaretesting.com` |
-| `API_BASE_URL` | `https://api.practicesoftwaretesting.com` |
+| `PRODUCT_ID` | `01M2K06AY3Z00981PCAFEHXBT7` |
 | `HEADLESS` | `true` |
 | `MAX_DIFF_PIXEL_RATIO` | `0.01` |

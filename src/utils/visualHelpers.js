@@ -21,6 +21,7 @@ function dynamicMasks(page) {
   return [
     page.locator('.testing-notification-bar'),
     page.locator('[data-test="nav-profile"]'),
+    page.locator('#chat-button, .grecaptcha-badge'),
   ];
 }
 

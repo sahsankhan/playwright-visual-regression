@@ -10,7 +10,8 @@
     "test:update-snapshots": "playwright test --update-snapshots",
     "report": "playwright show-report",
     "report:summary": "node src/utils/visualReport.js",
-    "demo:diff": "node scripts/capture-readme-diff.js"
+    "demo:diff": "node scripts/capture-readme-diff.js",
+    "test:update-snapshots:docker": "docker run --rm -v \"${PWD}:/work\" -w /work mcr.microsoft.com/playwright:v1.55.0-noble bash -lc \"npm ci && npx playwright test --grep @smoke --update-snapshots\""
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",

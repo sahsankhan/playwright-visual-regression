@@ -1,6 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { uiBaseUrl } = require('../src/config');
-const { fetchFirstInStockProductId } = require('../src/utils/catalogApi');
+const { uiBaseUrl, productId } = require('../src/config');
 const { prepareCatalogPage, prepareProductPage, dynamicMasks } = require('../src/utils/visualHelpers');
 
 test.describe('Toolshop visual regression @smoke', () => {
@@ -15,7 +14,6 @@ test.describe('Toolshop visual regression @smoke', () => {
   });
 
   test('product detail matches baseline', async ({ page }) => {
-    const productId = await fetchFirstInStockProductId();
     await page.goto(`${uiBaseUrl}/product/${productId}`);
     await prepareProductPage(page);
 

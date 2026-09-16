@@ -1,4 +1,4 @@
-const { defineConfig, devices } = require('@playwright/test');
+const { defineConfig } = require('@playwright/test');
 const { uiBaseUrl, headless, timeoutMs, maxDiffPixelRatio } = require('./src/config');
 
 const isCi = Boolean(process.env.CI);
@@ -44,7 +44,12 @@ module.exports = defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        browserName: 'chromium',
+        launchOptions: {
+          args: ['--font-render-hinting=none'],
+        },
+      },
     },
   ],
 });

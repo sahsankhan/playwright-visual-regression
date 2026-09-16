@@ -14,7 +14,7 @@
     "test:update-snapshots:docker": "docker run --rm -v \"${PWD}:/work\" -w /work mcr.microsoft.com/playwright:v1.55.0-noble bash -lc \"npm ci && npx playwright test --grep @smoke --update-snapshots\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
+    "@playwright/test": "1.55.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.7"
   }

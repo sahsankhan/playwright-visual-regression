@@ -26,6 +26,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Generate Linux baselines if missing
+        # Skip when home-catalog-linux.png is already committed.
         if: hashFiles('tests/catalog-visual.spec.js-snapshots/home-catalog-linux.png') == ''
         run: npx playwright test --grep @smoke --update-snapshots
         env:

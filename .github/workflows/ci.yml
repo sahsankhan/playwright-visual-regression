@@ -25,17 +25,16 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run visual regression smoke
-        run: |
-          if [ ! -f tests/catalog-visual.spec.js-snapshots/home-catalog-linux.png ]; then
-            echo "Linux baselines missing — generating them on this runner"
-            npx playwright test --grep @smoke --update-snapshots
-          else
-            npm run test:smoke
-          fi
+      - name: Generate Linux baselines if missing
+        if: hashFiles('tests/catalog-visual.spec.js-snapshots/home-catalog-linux.png') == ''
+        run: npx playwright test --grep @smoke --update-snapshots
         env:
           CI: true
-          NODE_OPTIONS: --dns-result-order=ipv4first
+
+      - name: Run visual regression smoke
+        run: npm run test:smoke
+        env:
+          CI: true
 
       - name: Commit Linux baselines
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -43,8 +42,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tests/catalog-visual.spec.js-snapshots/
-          git diff --staged --quiet || git commit -m "Add Linux visual baselines from GitHub Actions"
-          git push
+          if git diff --staged --quiet; then
+            echo "No snapshot changes to commit"
+          else
+            git commit -m "Add Linux visual baselines from GitHub Actions"
+            git push
+          fi
 
       - name: Build visual summary
         if: always()
@@ -58,4 +61,5 @@ jobs:
           path: |
             playwright-report/
             reports/
+            test-results/
           if-no-files-found: ignore

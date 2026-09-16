@@ -1,4 +1,4 @@
-const { defineConfig } = require('@playwright/test');
+const { defineConfig, devices } = require('@playwright/test');
 const { uiBaseUrl, headless, timeoutMs, maxDiffPixelRatio } = require('./src/config');
 
 const isCi = Boolean(process.env.CI);
@@ -37,15 +37,19 @@ module.exports = defineConfig({
     headless,
     actionTimeout: 15_000,
     navigationTimeout: 60_000,
-    viewport: { width: 1280, height: 720 },
-    deviceScaleFactor: 1,
+    locale: 'en-US',
+    timezoneId: 'UTC',
+    colorScheme: 'light',
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
       name: 'chromium',
       use: {
-        browserName: 'chromium',
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        deviceScaleFactor: 1,
         launchOptions: {
           args: ['--font-render-hinting=none', '--disable-dev-shm-usage'],
         },

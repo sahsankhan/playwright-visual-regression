@@ -26,12 +26,15 @@ jobs:
         run: npx playwright test --grep @smoke --update-snapshots
         env:
           CI: true
-          NODE_OPTIONS: --dns-result-order=ipv4first
 
       - name: Commit updated baselines
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tests/catalog-visual.spec.js-snapshots/
-          git diff --staged --quiet || git commit -m "Update Linux visual baselines from GitHub Actions"
-          git push
+          if git diff --staged --quiet; then
+            echo "No snapshot changes to commit"
+          else
+            git commit -m "Update Linux visual baselines from GitHub Actions"
+            git push
+          fi

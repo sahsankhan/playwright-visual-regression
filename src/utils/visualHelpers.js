@@ -1,17 +1,21 @@
 /** @param {import('@playwright/test').Page} page */
+async function waitForVisible(page, selector, timeout = 45_000) {
+  try {
+    await page.locator(selector).first().waitFor({ state: 'visible', timeout });
+  } catch (error) {
+    const title = await page.title().catch(() => '');
+    const bodyText = await page.locator('body').innerText().catch(() => '');
+    throw new Error(
+      `Timed out waiting for ${selector} at ${page.url()} (title: "${title}"). ` +
+        `Body starts with: ${bodyText.replace(/\s+/g, ' ').slice(0, 300)}`,
+    );
+  }
+}
+
+/** @param {import('@playwright/test').Page} page */
 async function prepareCatalogPage(page) {
   await page.waitForLoadState('domcontentloaded');
-  await page
-    .locator('[data-test="product-name"]')
-    .first()
-    .waitFor({ state: 'visible', timeout: 60_000 });
-  await page.evaluate(() => {
-    document.querySelectorAll('img').forEach((img) => {
-      if (!img.complete) {
-        img.addEventListener('load', () => {}, { once: true });
-      }
-    });
-  });
+  await waitForVisible(page, '[data-test="product-name"]');
   await page.waitForTimeout(500);
 }
 
@@ -27,7 +31,7 @@ function dynamicMasks(page) {
 /** @param {import('@playwright/test').Page} page */
 async function prepareProductPage(page) {
   await page.waitForLoadState('domcontentloaded');
-  await page.locator('[data-test="add-to-cart"]').waitFor({ state: 'visible', timeout: 60_000 });
+  await waitForVisible(page, '[data-test="add-to-cart"]');
   await page.locator('h1').first().waitFor({ state: 'visible' });
   await page.waitForTimeout(500);
 }

@@ -13,10 +13,44 @@ async function waitForVisible(page, selector, timeout = 45_000) {
 }
 
 /** @param {import('@playwright/test').Page} page */
+async function stabilizePage(page) {
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+      html { scrollbar-width: none !important; }
+      body { overflow: hidden !important; }
+      .testing-notification-bar,
+      [data-test="nav-profile"],
+      #chat-button,
+      .grecaptcha-badge,
+      iframe[src*="recaptcha"] {
+        display: none !important;
+      }
+    `,
+  });
+}
+
+/** @param {import('@playwright/test').Page} page */
+async function waitForImages(page) {
+  await page.waitForFunction(() => {
+    const images = [...document.querySelectorAll('.card img, [data-test="product-image"] img, img.card-img-top')];
+    if (!images.length) {
+      return true;
+    }
+    return images.every((img) => img.complete && img.naturalWidth > 0);
+  }, { timeout: 30_000 }).catch(() => {});
+  await page.waitForTimeout(400);
+}
+
+/** @param {import('@playwright/test').Page} page */
 async function prepareCatalogPage(page) {
   await page.waitForLoadState('domcontentloaded');
   await waitForVisible(page, '[data-test="product-name"]');
-  await page.waitForTimeout(500);
+  await stabilizePage(page);
+  await waitForImages(page);
 }
 
 /** @param {import('@playwright/test').Page} page */
@@ -33,7 +67,8 @@ async function prepareProductPage(page) {
   await page.waitForLoadState('domcontentloaded');
   await waitForVisible(page, '[data-test="add-to-cart"]');
   await page.locator('h1').first().waitFor({ state: 'visible' });
-  await page.waitForTimeout(500);
+  await stabilizePage(page);
+  await waitForImages(page);
 }
 
 module.exports = {

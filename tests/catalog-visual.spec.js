@@ -4,7 +4,7 @@ const { prepareCatalogPage, prepareProductPage, dynamicMasks } = require('../src
 
 test.describe('Toolshop visual regression @smoke', () => {
   test('home catalog matches baseline', async ({ page }) => {
-    await page.goto(`${uiBaseUrl}/`);
+    await page.goto(`${uiBaseUrl}/`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await prepareCatalogPage(page);
 
     await expect(page).toHaveScreenshot('home-catalog.png', {
@@ -14,7 +14,7 @@ test.describe('Toolshop visual regression @smoke', () => {
   });
 
   test('product detail matches baseline', async ({ page }) => {
-    await page.goto(`${uiBaseUrl}/product/${productId}`);
+    await page.goto(`${uiBaseUrl}/product/${productId}`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await prepareProductPage(page);
 
     await expect(page).toHaveScreenshot('product-detail.png', {

@@ -1,11 +1,10 @@
 /** @param {import('@playwright/test').Page} page */
 async function prepareCatalogPage(page) {
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
   await page
     .locator('[data-test="product-name"]')
     .first()
-    .waitFor({ state: 'visible', timeout: 45_000 });
+    .waitFor({ state: 'visible', timeout: 60_000 });
   await page.evaluate(() => {
     document.querySelectorAll('img').forEach((img) => {
       if (!img.complete) {
@@ -13,7 +12,7 @@ async function prepareCatalogPage(page) {
       }
     });
   });
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
 }
 
 /** @param {import('@playwright/test').Page} page */
@@ -27,8 +26,8 @@ function dynamicMasks(page) {
 
 /** @param {import('@playwright/test').Page} page */
 async function prepareProductPage(page) {
-  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
-  await page.locator('[data-test="add-to-cart"]').waitFor({ state: 'visible', timeout: 30_000 });
+  await page.waitForLoadState('domcontentloaded');
+  await page.locator('[data-test="add-to-cart"]').waitFor({ state: 'visible', timeout: 60_000 });
   await page.locator('h1').first().waitFor({ state: 'visible' });
   await page.waitForTimeout(500);
 }

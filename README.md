@@ -82,6 +82,6 @@ Runs `npm run test:smoke` on push/PR. The `@demo` diff test is README-only — n
 | Variable | Default |
 |---|---|
 | `UI_BASE_URL` | `https://practicesoftwaretesting.com` |
-| `PRODUCT_ID` | `01M2K06AY3Z00981PCAFEHXBT7` |
+| `PRODUCT_ID` | `01M2MTJ2QH6C62RDQHWFVAVE9Y` |
 | `HEADLESS` | `true` |
 | `MAX_DIFF_PIXEL_RATIO` | `0.01` |

@@ -12,7 +12,7 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.55.0-noble
     permissions:
       contents: write
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -24,19 +24,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Bootstrap Linux Docker baselines
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      - name: Run visual regression smoke
         run: |
           MARKER="tests/catalog-visual.spec.js-snapshots/.linux-docker-baseline"
-          if [ ! -f "$MARKER" ]; then
+          if [ ! -f "$MARKER" ] && [ "${{ github.ref }}" = "refs/heads/master" ] && [ "${{ github.event_name }}" = "push" ]; then
             npx playwright test --grep @smoke --update-snapshots
             touch "$MARKER"
+          else
+            npm run test:smoke
           fi
-        env:
-          CI: true
-
-      - name: Run visual regression smoke
-        run: npm run test:smoke
         env:
           CI: true
 

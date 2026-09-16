@@ -52,8 +52,12 @@ function copyIfExists(source, dest) {
 
 function resolveBaseline(snapshotName) {
   const snapshotDir = path.join('tests', 'catalog-visual.spec.js-snapshots');
-  const baseline = path.join(snapshotDir, snapshotName);
-  return fs.existsSync(baseline) ? baseline : null;
+  const stem = snapshotName.replace(/\.png$/i, '');
+  const candidates = [
+    path.join(snapshotDir, `${stem}-${process.platform}.png`),
+    path.join(snapshotDir, snapshotName),
+  ];
+  return candidates.find((file) => fs.existsSync(file)) || null;
 }
 
 function snapshotNameFromTitle(title) {

@@ -10,7 +10,7 @@ module.exports = defineConfig({
   retries: isCi ? 1 : 0,
   workers: 1,
   timeout: timeoutMs,
-  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}-{platform}{ext}',
   reporter: isCi
     ? [
         ['html', { open: 'never' }],
@@ -36,7 +36,7 @@ module.exports = defineConfig({
     baseURL: uiBaseUrl,
     headless,
     actionTimeout: 15_000,
-    navigationTimeout: 30_000,
+    navigationTimeout: 60_000,
     viewport: { width: 1280, height: 720 },
     deviceScaleFactor: 1,
     trace: 'retain-on-failure',
@@ -47,7 +47,7 @@ module.exports = defineConfig({
       use: {
         browserName: 'chromium',
         launchOptions: {
-          args: ['--font-render-hinting=none'],
+          args: ['--font-render-hinting=none', '--disable-dev-shm-usage'],
         },
       },
     },

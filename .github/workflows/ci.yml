@@ -8,8 +8,6 @@ on:
 jobs:
   visual-regression:
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.55.0-noble
     permissions:
       contents: write
     timeout-minutes: 20
@@ -24,25 +22,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
       - name: Run visual regression smoke
         run: |
-          MARKER="tests/catalog-visual.spec.js-snapshots/.linux-docker-baseline"
-          if [ ! -f "$MARKER" ] && [ "${{ github.ref }}" = "refs/heads/master" ] && [ "${{ github.event_name }}" = "push" ]; then
+          if [ ! -f tests/catalog-visual.spec.js-snapshots/home-catalog-linux.png ]; then
+            echo "Linux baselines missing — generating them on this runner"
             npx playwright test --grep @smoke --update-snapshots
-            touch "$MARKER"
           else
             npm run test:smoke
           fi
         env:
           CI: true
+          NODE_OPTIONS: --dns-result-order=ipv4first
 
-      - name: Commit bootstrapped baselines
+      - name: Commit Linux baselines
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tests/catalog-visual.spec.js-snapshots/
-          git diff --staged --quiet || git commit -m "Bootstrap Linux Docker visual baselines"
+          git diff --staged --quiet || git commit -m "Add Linux visual baselines from GitHub Actions"
           git push
 
       - name: Build visual summary

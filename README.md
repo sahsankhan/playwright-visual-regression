@@ -43,10 +43,10 @@ npm run report              # open Playwright HTML report
 
 | Screen | Baseline |
 |---|---|
-| Home catalog | `tests/catalog-visual.spec.js-snapshots/home-catalog.png` |
-| Product detail | `tests/catalog-visual.spec.js-snapshots/product-detail.png` |
+| Home catalog | `tests/catalog-visual.spec.js-snapshots/home-catalog-{platform}.png` |
+| Product detail | `tests/catalog-visual.spec.js-snapshots/product-detail-{platform}.png` |
 
-Product detail uses a fixed product ID (`PRODUCT_ID` in `.env`) so the screenshot stays stable.
+Windows local runs use `-win32` snapshots. CI uses `-linux` snapshots generated on GitHub Actions. Product detail resolves a live product ID from the Toolshop API (override with `PRODUCT_ID`).
 
 ## How it works
 
@@ -56,13 +56,7 @@ Product detail uses a fixed product ID (`PRODUCT_ID` in `.env`) so the screensho
 
 **On failure** — Playwright outputs Expected, Actual, and Diff images. Default tolerance: 1% pixel difference (`MAX_DIFF_PIXEL_RATIO=0.01` in `.env`).
 
-**Platform** — Baselines are generated in the official Playwright Docker image (same as CI). Regenerate with:
-
-```powershell
-npm run test:update-snapshots:docker
-```
-
-(Docker required.) Or run the **Update Snapshots** workflow on GitHub Actions.
+**Platform** — Screenshot rendering differs between Windows and Linux, so baselines are stored per OS. After the first successful CI run, Linux snapshots are committed automatically. Local Windows: `npm run test:update-snapshots`.
 
 ## Reports
 
@@ -71,11 +65,11 @@ npm run test:update-snapshots:docker
 | Visual summary | `reports/visual-summary.html` |
 | Playwright HTML (interactive diffs) | `playwright-report/index.html` |
 
-CI uploads both as the `visual-regression-reports` artifact.
+CI always builds the summary and uploads `visual-regression-reports` (even when tests fail). Download it from the Actions run page.
 
 ## CI
 
-Runs `npm run test:smoke` on push/PR. The `@demo` diff test is README-only — not part of CI.
+Runs `npm run test:smoke` on Ubuntu (not Docker). The `@demo` diff test is README-only — not part of CI.
 
 ## Environment
 

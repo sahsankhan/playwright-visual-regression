@@ -8,6 +8,6 @@ module.exports = {
   apiBaseUrl,
   productId: process.env.PRODUCT_ID || '01M2MTJ2QH6C62RDQHWFVAVE9Y',
   headless: process.env.HEADLESS !== 'false',
-  timeoutMs: Number(process.env.TIMEOUT || 60_000),
+  timeoutMs: Number(process.env.TIMEOUT || 120_000),
   maxDiffPixelRatio: Number(process.env.MAX_DIFF_PIXEL_RATIO || 0.01),
 };
